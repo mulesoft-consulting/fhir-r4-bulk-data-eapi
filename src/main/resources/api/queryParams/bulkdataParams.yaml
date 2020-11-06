@@ -1,0 +1,10 @@
+_outputFormat:
+  required: false
+  default: "application/fhir+ndjson"
+  description: The format for the requested bulk data files to be generated.
+_since:
+  required: false
+  description: Resources updated after this period will be included in the response.
+_type: 
+  required: false
+  description: A string of comma-delimited FHIR resource types. 

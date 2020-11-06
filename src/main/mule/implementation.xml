@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="impl-get:\$export:fhir-r4-bulk-data-eapi-config" doc:id="295d3dcd-e236-4c95-bc12-4b3642729362" >
+		<logger level="INFO" message="get:\$export:fhir-r4-bulk-data-api-config" />
+		<set-variable value="#[uuid()]" doc:name="Set Instance ID" doc:id="6cb7a826-3d1e-4cb3-83f6-3d1f99131585" variableName="instanceId"/>
+		<ee:transform doc:name="Transform Message" doc:id="cd143332-dfe0-4315-8574-b4ff9a143c95" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"instanceId": vars.instanceId,
+	"lastUpdatedTime": (now() >> "UTC"),	
+	"instanceState": "SUBMITTED",
+	"batchStatus": "STARTING",
+	"type": attributes.queryParams."_type",
+	"submitter": "fhiruser"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="a03e47e8-b9d9-4841-baa5-f641c83d11e6" >
+			<mongo:insert-document collectionName="bulk-data-jobs" doc:name="Insert document" doc:id="620d0595-dbaa-4045-a6a2-590ea7e33d58" config-ref="MongoDB_Config" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e57a67b2-8912-4cbd-94dc-0072b1e21aef" type="ANY">
+					<set-variable value="500" doc:name="Set Variable" doc:id="b7524a38-e651-4ef6-98ba-df94e579c637" variableName="httpStatus"/>
+					<ee:transform doc:name="Transform Message" doc:id="8dea4284-8d7c-4f62-afd2-0493c893b1d2" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "resourceType" : "OperationOutcome",
+  "issue" : [{
+    "severity" : "error", 
+    "code" : "processing",
+    "details" : { 
+    	"text": "Unable to process request" 
+    }
+  }]
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<set-variable value="#[vars.outboundHeaders default {} ++ { &quot;Content-Location&quot; : p('baseUrl') ++ &quot;/job/&quot; ++ vars.instanceId}]" doc:name="Set Content-Location" doc:id="3c38d012-d5e1-414a-9dc1-37018a446933" variableName="outboundHeaders"/>
+		<ee:transform doc:name="Transform Message" doc:id="80d0ae45-887c-4b90-b8c2-7379055fb9fa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "resourceType" : "OperationOutcome",
+  "issue" : [{
+    "severity" : "information", 
+    "code" : "processing",
+    "details" : { 
+    	"text": "Request has been received" 
+    }
+  }]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
