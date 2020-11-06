@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+
 	<flow name="impl-get:\$export:fhir-r4-bulk-data-eapi-config" doc:id="295d3dcd-e236-4c95-bc12-4b3642729362" >
 		<logger level="INFO" message="get:\$export:fhir-r4-bulk-data-api-config" />
 		<set-variable value="#[uuid()]" doc:name="Set Instance ID" doc:id="6cb7a826-3d1e-4cb3-83f6-3d1f99131585" variableName="instanceId"/>
@@ -23,9 +25,31 @@ output application/json
 	"submitter": "fhiruser"
 }]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="jobInstance" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"instanceId": vars.instanceId,
+	"lastUpdatedTime": (now() >> "UTC"),	
+	"instanceState": "SUBMITTED",
+	"batchStatus": "STARTING",
+	"type": attributes.queryParams."_type",
+	"since": attributes.queryParams."_since",
+	"submitter": "fhiruser"
+}]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
 		<try doc:name="Try" doc:id="a03e47e8-b9d9-4841-baa5-f641c83d11e6" >
 			<mongo:insert-document collectionName="bulk-data-jobs" doc:name="Insert document" doc:id="620d0595-dbaa-4045-a6a2-590ea7e33d58" config-ref="MongoDB_Config" />
+			<anypoint-mq:publish doc:name="Publish" doc:id="0cc458bf-0e89-44b0-bcbd-a716413cac78" config-ref="Anypoint_MQ_Config" destination="${anypoint.mq.destination}">
+				<anypoint-mq:body ><![CDATA[#[vars.jobInstance]]]></anypoint-mq:body>
+				<anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	"instanceId" : vars.instanceId
+}]]]></anypoint-mq:properties>
+			</anypoint-mq:publish>
 			<error-handler >
 				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e57a67b2-8912-4cbd-94dc-0072b1e21aef" type="ANY">
 					<set-variable value="500" doc:name="Set Variable" doc:id="b7524a38-e651-4ef6-98ba-df94e579c637" variableName="httpStatus"/>
