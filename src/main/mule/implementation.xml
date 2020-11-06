@@ -19,6 +19,7 @@ output application/json
 	"instanceState": "SUBMITTED",
 	"batchStatus": "STARTING",
 	"type": attributes.queryParams."_type",
+	"since": attributes.queryParams."_since",
 	"submitter": "fhiruser"
 }]]></ee:set-payload>
 			</ee:message>
