@@ -16,6 +16,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<mongo:connection-string-connection connectionString="mongodb+srv://${secure::mongodb.username}:${secure::mongodb.password}@fhir-hkjgt.mongodb.net/${mongodb.database}?retryWrites=true&amp;w=majority" />
 	</mongo:config>
 	<global-property doc:name="Global Property" doc:id="e9f0767d-d43f-47d4-9b2a-8db1ae9988cd" name="baseUrl" value="http://localhost:8081" />
+	<global-property doc:name="Global Property" doc:id="3e27bf9f-b1b9-4c12-94a0-3b299388931b" name="baseProcessingUrl" value="http://localhost:8081" />
 	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="cc0abad5-5104-43e8-9d9b-56beba023164" >
 		<anypoint-mq:connection clientId="${secure::anypoint.mq.client_id}" clientSecret="${secure::anypoint.mq.client_secret}" />
 	</anypoint-mq:config>
