@@ -74,7 +74,7 @@ output application/json
 				</on-error-propagate>
 			</error-handler>
 		</try>
-		<set-variable value="#[vars.outboundHeaders default {} ++ { &quot;Content-Location&quot; : p('baseProcessingUrl') ++ &quot;/api/job/&quot; ++ vars.instanceId}]" doc:name="Set Content-Location" doc:id="3c38d012-d5e1-414a-9dc1-37018a446933" variableName="outboundHeaders"/>
+		<set-variable value="#[vars.outboundHeaders default {} ++ { &quot;Content-Location&quot; : p('bulkProcessingUrl') ++ &quot;/api/job/&quot; ++ vars.instanceId}]" doc:name="Set Content-Location" doc:id="3c38d012-d5e1-414a-9dc1-37018a446933" variableName="outboundHeaders"/>
 		<ee:transform doc:name="Transform Message" doc:id="80d0ae45-887c-4b90-b8c2-7379055fb9fa" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
