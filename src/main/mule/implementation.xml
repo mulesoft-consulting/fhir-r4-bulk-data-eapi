@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
 	<flow name="impl-get:\$export:fhir-r4-bulk-data-eapi-config" doc:id="295d3dcd-e236-4c95-bc12-4b3642729362" >
 		<logger level="INFO" message="get:\$export:fhir-r4-bulk-data-api-config" />
-		<set-variable value="#[uuid()]" doc:name="Set Instance ID" doc:id="6cb7a826-3d1e-4cb3-83f6-3d1f99131585" variableName="instanceId"/>
+		<set-variable value="#[uuid()]" doc:name="Set Instance ID" doc:id="6cb7a826-3d1e-4cb3-83f6-3d1f99131585" variableName="instanceId" doc:description="The instanceId is the ID we use to track the request in the bulk-job-data collection in Mongo. "/>
 		<ee:transform doc:name="Transform Message" doc:id="cd143332-dfe0-4315-8574-b4ff9a143c95" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
