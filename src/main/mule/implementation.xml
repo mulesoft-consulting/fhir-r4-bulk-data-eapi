@@ -21,7 +21,7 @@ output application/json
 	"batchStatus": "STARTING",
 	"type": attributes.queryParams."_type",
 	"since": attributes.queryParams."_since",
-	"request": p('baseProcessingUrl') ++ attributes.rawRequestUri,
+	"request": p('baseUrl') ++ attributes.rawRequestUri,
 	"submitter": "fhiruser"
 }]]></ee:set-payload>
 			</ee:message>
@@ -36,7 +36,7 @@ output application/json
 	"batchStatus": "STARTING",
 	"type": attributes.queryParams."_type",
 	"since": attributes.queryParams."_since",
-	"request": p('baseProcessingUrl') ++ attributes.rawRequestUri,
+	"request": p('baseUrl') ++ attributes.rawRequestUri,
 	"submitter": "fhiruser"
 }]]></ee:set-variable>
 			</ee:variables>
